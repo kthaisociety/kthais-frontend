@@ -126,8 +126,12 @@ export function AsciiGrid({
       const parent = canvas.parentElement
       if (parent) {
         const dpr = window.devicePixelRatio || 1
-        canvas.width = parent.clientWidth * dpr
-        canvas.height = parent.clientHeight * dpr
+        const width = Math.floor(parent.clientWidth * dpr)
+        const height = Math.floor(parent.clientHeight * dpr)
+        // Nothing to redo when the size didn't actually change.
+        if (canvas.width === width && canvas.height === height) return
+        canvas.width = width
+        canvas.height = height
         ctx.scale(dpr, dpr)
         
         // Reinitialize drips on resize
@@ -185,6 +189,11 @@ export function AsciiGrid({
     }
 
     window.addEventListener("resize", resize)
+    // The container can also change size without the window doing so, e.g.
+    // when content loads inside a section the grid covers. Without this the
+    // canvas keeps its old pixel size and the browser stretches it to fit.
+    const resizeObserver = new ResizeObserver(() => resize())
+    if (canvas.parentElement) resizeObserver.observe(canvas.parentElement)
     resize()
     
     // Mouse event handlers
@@ -346,6 +355,7 @@ export function AsciiGrid({
 
     return () => {
       window.removeEventListener("resize", resize)
+      resizeObserver.disconnect()
       canvas.removeEventListener("mousemove", handleMouseMove)
       canvas.removeEventListener("mouseleave", handleMouseLeave)
       cancelAnimationFrame(animationFrameId)
