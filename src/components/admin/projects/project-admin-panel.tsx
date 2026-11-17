@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Plus, Search, Edit, Trash2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +31,7 @@ import { ProjectForm } from "@/components/admin/projects/project-form";
 type FormMode = { type: "new" } | { type: "edit"; projectId: string } | null;
 
 export function ProjectAdminPanel() {
+  const queryClient = useQueryClient();
   const { data: projects, isLoading, isError } = useProjects();
   const { mutate: deleteProject, isPending: isDeleting } = useDeleteProject();
 
@@ -144,6 +146,7 @@ export function ProjectAdminPanel() {
                           variant="outline"
                           size="sm"
                           onClick={() => {
+                            queryClient.setQueryData(["project", project.id], project);
                             setFormMode({ type: "edit", projectId: project.id });
                           }}
                         >

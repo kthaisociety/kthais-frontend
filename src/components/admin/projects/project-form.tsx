@@ -151,7 +151,9 @@ export function ProjectForm({ projectId, onClose }: { projectId?: string; onClos
       techStack: initialData.techStack || [],
       problemImpact: initialData.problemImpact || "",
       keyFeatures: initialData.keyFeatures || [],
-      status: initialData.status || statusOptions[0],
+      status: statusOptions.includes(initialData.status)
+        ? initialData.status
+        : "",
       coverImage: initialData.coverImage || "",
       websiteUrl: initialData.websiteUrl || "",
       repoUrl: initialData.repoUrl || "",
@@ -168,6 +170,12 @@ export function ProjectForm({ projectId, onClose }: { projectId?: string; onClos
       contact: initialData.contact || "",
     });
   }, [initialData]);
+
+  const savedStatus = statusOptions.includes(form.status)
+    ? form.status
+    : initialData?.status && statusOptions.includes(initialData.status)
+      ? initialData.status
+      : "";
 
   // --- Handlers ---
   const handleTextChange =
@@ -360,7 +368,7 @@ export function ProjectForm({ projectId, onClose }: { projectId?: string; onClos
        techStack: form.techStack.join(", "),
        problemImpact: form.problemImpact,
        keyFeatures: form.keyFeatures.join("<SEP>"),
-       status: form.status,
+       status: savedStatus,
        screenshots: JSON.stringify(form.screenshots),
        repoUrl: form.repoUrl,
        contributors: form.contributors.map(
@@ -864,7 +872,7 @@ export function ProjectForm({ projectId, onClose }: { projectId?: string; onClos
                     <div className="space-y-2 md:col-span-2 sm:col-span-1">
                       <Label htmlFor="project-status">Current Status</Label>
                       <Select
-                        value={form.status}
+                        value={savedStatus || undefined}
                         // Radix Select can report "" when its value is set right
                         // after mounting (edit mode loads the saved status that
                         // way), which wiped the status. No option is empty, so
