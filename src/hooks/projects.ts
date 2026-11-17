@@ -141,7 +141,7 @@ export function transformProjectData(
     keyFeatures: parseSepStringToArray(backendData.keyFeatures),
     
     problemImpact: backendData.problemImpact || "",
-    status: backendData.status || "planning",
+    status: backendData.status ?? "",
 
     coverImage: resolvedCoverImage,
     screenshots: screenshotsWithoutCover,
